@@ -19,8 +19,15 @@ class MinhaArvoreDeBuscaBinaria : public ArvoreDeBuscaBinaria<T>{
     };
 
     ~MinhaArvoreDeBuscaBinaria(){
-
+        Nodo<T> * nodo = this->_raiz;
+        Destrutor_aux(nodo);
     };
+
+    void Destrutor_aux(Nodo<T> * nodo){
+        Destrutor_aux(nodo->filhoDireita);
+        Destrutor_aux(nodo->filhoEsquerda);
+        delete nodo;
+    }
 
     bool vazia() const{
         if (this->_raiz == NULL){
@@ -32,8 +39,22 @@ class MinhaArvoreDeBuscaBinaria : public ArvoreDeBuscaBinaria<T>{
     };
     
     int quantidade() const{
-        return 0;
+        Nodo<int> * nodo = this->_raiz;
+        if(nodo == NULL){
+            return 0;
+        }
+        int quantidade = quantidade_aux(nodo);
+        return quantidade;
     };
+
+    int quantidade_aux(Nodo<int> * nodo) const {
+        if (nodo){
+            return 1 + quantidade_aux(nodo->filhoDireita) + quantidade_aux(nodo->filhoEsquerda);
+        }
+        else{
+            return 0;
+        }
+    }
 
     bool contem(T chave) const{
         return 0;
