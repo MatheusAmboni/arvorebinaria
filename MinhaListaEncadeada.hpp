@@ -5,22 +5,23 @@
 
 template <typename T>
 class MinhaListaEncadeada :  public ListaEncadeadaAbstrata<T>{
+  public:
   MinhaListaEncadeada(){
       this->_primeiro = NULL;
       this->_tamanho = 0;
   }
 
   ~MinhaListaEncadeada(){
-    Elemento<T> *ProximoElemento = NULL;
+    Elemento<T> *proximoElemento = NULL;
     Elemento<T> *ElementoAuxiliar = this->_primeiro;
     while(ElementoAuxiliar != NULL){
-      ProximoElemento = ElementoAuxiliar->proximo;
+      proximoElemento = ElementoAuxiliar->_proximo;
       delete ElementoAuxiliar;
-      ElementoAuxiliar = ProximoElemento;
+      ElementoAuxiliar = proximoElemento;
     }
   };
 
-  std::size_t tamanho() const{
+  int getTamanho(){
     int count = 0;
     Elemento<T> *atual = this->_primeiro;
     if (atual == NULL){
@@ -28,14 +29,14 @@ class MinhaListaEncadeada :  public ListaEncadeadaAbstrata<T>{
     }
     else{
       while (atual != NULL){
-        atual = atual->proximo;
+        atual = atual->_proximo;
         count++;
       }
     }
     return count;
   };
 
-  bool vazia() const{
+  bool estaVazia(){
     if (this->_primeiro == NULL){
       return true;
     }
@@ -44,7 +45,7 @@ class MinhaListaEncadeada :  public ListaEncadeadaAbstrata<T>{
     }
   };
 
-  std::size_t posicao(T dado) const{
+  int posicao(T umDado){
     if(this->_tamanho == 0){
       throw lista_encadeada_vazia_exception();
     }
@@ -52,116 +53,119 @@ class MinhaListaEncadeada :  public ListaEncadeadaAbstrata<T>{
       Elemento<T> *ElementoAuxiliar = this->_primeiro;
       size_t indice = 0;
       while (ElementoAuxiliar != NULL){
-        if(dado == ElementoAuxiliar->dado){
+        if(umDado == ElementoAuxiliar->_dado){
           return indice;
         }
         indice++;
-        ElementoAuxiliar = ElementoAuxiliar->proximo;
+        ElementoAuxiliar = ElementoAuxiliar->_proximo;
       }
       if(ElementoAuxiliar == NULL){
-        throw nao_implementado_exception();
+        throw posicao_invalida_exception();
       } 
       return 0;
     }
   };
 
-  bool contem(T dado) const{
+  bool contem(T umDado){
     Elemento<T> *ElemAtual = (this->_primeiro);
       while(ElemAtual != NULL){
-        if (ElemAtual->dado == dado){
+        if (ElemAtual->_dado == umDado){
           return true;
         }
-        ElemAtual = ElemAtual->proximo;
+        ElemAtual = ElemAtual->_proximo;
       }
       return false;
   };
 
-  void inserirNoInicio(T dado){
-    Elemento<T> *novoElemento = new Elemento<T>(dado, nullptr);
-    novoElemento->proximo = this->_primeiro;
+  void adicionaNoInicio(T umDado){
+    Elemento<T> *novoElemento = new Elemento<T>;
+    novoElemento->_proximo = this->_primeiro;
+    novoElemento->_dado = umDado;
     this->_primeiro = novoElemento;
     this->_tamanho++;
   };
 
-  void inserir(size_t posicao, T dado){
-    if(posicao == 0 and tamanho() >= 0){
-      inserirNoInicio(dado);
+  void adicionaNaPosicao(T umDado, int posicao) {
+    if(posicao == 0 and getTamanho() >= 0){
+      adicionaNoInicio(umDado);
     }
-    else if (posicao < 0 or posicao > tamanho()){
-      throw nao_implementado_exception();
+    else if (posicao < 0 or posicao > getTamanho()){
+      throw posicao_invalida_exception();
     }
-    else if(posicao == tamanho()){
-      inserirNoFim(dado);
+    else if(posicao == getTamanho()){
+      adicionaNoFim(umDado);
     }
     else{
       int aux = 0;
       Elemento<T> *ElementoAuxiliar = this->_primeiro ;
-      while(aux < posicao - 1 and ElementoAuxiliar->proximo != NULL and ElementoAuxiliar != NULL){
-        ElementoAuxiliar = ElementoAuxiliar->proximo;
+      while(aux < posicao - 1 and ElementoAuxiliar->_proximo != NULL and ElementoAuxiliar != NULL){
+        ElementoAuxiliar = ElementoAuxiliar->_proximo;
         aux++;
       };
-      Elemento<T> *NovoElemento = new Elemento<T>(dado, nullptr);
-      NovoElemento->proximo = ElementoAuxiliar->proximo;
-      ElementoAuxiliar->proximo = NovoElemento;
+      Elemento<T> *NovoElemento = new Elemento<T>;
+      NovoElemento->_dado = umDado;
+      NovoElemento->_proximo = ElementoAuxiliar->_proximo;
+      ElementoAuxiliar->_proximo = NovoElemento;
       this->_tamanho++;
     }
     return;
   };
 
-  void inserirNoFim(T dado){
+  void adicionaNoFim(T umDado){
     if(this->_primeiro == NULL){
-      inserirNoInicio(dado);
+      adicionaNoInicio(umDado);
       return;
     }
     else{
-      Elemento<T> *NovoElemento = new Elemento<T>(dado, nullptr);
-      NovoElemento->proximo = NULL;
+      Elemento<T> *NovoElemento = new Elemento<T>;
+      NovoElemento->_dado = umDado;
+      NovoElemento->_proximo = NULL;
       Elemento<T> *UltimoElemento = this->_primeiro;
-      while (UltimoElemento->proximo != NULL){
-        UltimoElemento = UltimoElemento->proximo;
+      while (UltimoElemento->_proximo != NULL){
+        UltimoElemento = UltimoElemento->_proximo;
       }
-      UltimoElemento->proximo = NovoElemento;
+      UltimoElemento->_proximo = NovoElemento;
       this->_tamanho++;
       return;
     }
   };
 
-  T removerDoInicio(){
+  T retiraDoInicio(){
     if(this->_tamanho == 0){
       throw lista_encadeada_vazia_exception();
     }
     else{
       Elemento<T> *ElementoAuxiliar = this->_primeiro;
-      T dadoAux = ElementoAuxiliar->dado;
-      this->_primeiro = this->_primeiro->proximo;
+      T dadoAux = ElementoAuxiliar->_dado;
+      this->_primeiro = this->_primeiro->_proximo;
       delete ElementoAuxiliar;
       this->_tamanho--;
       return dadoAux;
     }
   };
 
-  T removerDe(size_t posicao){
-    if (vazia()){
-      throw nao_implementado_exception();
+  T retiraDaPosicao(int posicao){
+    if (estaVazia()){
+      throw lista_encadeada_vazia_exception();
     }
-    else if(posicao < 0 or posicao >= tamanho()){
-      throw nao_implementado_exception();
+    else if(posicao < 0 or posicao >= getTamanho()){
+      throw posicao_invalida_exception();
     }
     else if (posicao == 0){
-      return removerDoInicio();
+      return retiraDoInicio();
     }
     else{
       Elemento<T> *ElementoAuxiliar = this->_primeiro;
       for (int i = 0; ElementoAuxiliar != NULL and i < posicao-1; i++){
-        ElementoAuxiliar = ElementoAuxiliar->proximo;
+        ElementoAuxiliar = ElementoAuxiliar->_proximo;
       }
-      if (ElementoAuxiliar->proximo->proximo == NULL){
-        return removerDoFim(); 
+      if (ElementoAuxiliar->_proximo->_proximo == NULL){
+        return retiraDoFim(); 
       }
-      else if (ElementoAuxiliar != NULL or ElementoAuxiliar->proximo != NULL){
-        Elemento<T> *ElementoDeleta = ElementoAuxiliar->proximo;
-        ElementoAuxiliar->proximo = ElementoAuxiliar->proximo->proximo;
-        T aux = ElementoDeleta->dado;
+      else if (ElementoAuxiliar != NULL or ElementoAuxiliar->_proximo != NULL){
+        Elemento<T> *ElementoDeleta = ElementoAuxiliar->_proximo;
+        ElementoAuxiliar->_proximo = ElementoAuxiliar->_proximo->_proximo;
+        T aux = ElementoDeleta->_dado;
         delete ElementoDeleta;
         this->_tamanho--;
         return aux;
@@ -170,39 +174,40 @@ class MinhaListaEncadeada :  public ListaEncadeadaAbstrata<T>{
     return 0;
   };
 
-  T removerDoFim(){
+  T retiraDoFim(){
     Elemento<T> *ElementoAuxiliar = this->_primeiro;
     if (this->_primeiro == NULL){
       throw lista_encadeada_vazia_exception();
     }
-    else if (ElementoAuxiliar->proximo == NULL){
-      return removerDoInicio();
+    else if (ElementoAuxiliar->_proximo == NULL){
+      return retiraDoInicio();
     }
     else{
-      while (ElementoAuxiliar->proximo->proximo != NULL){
-        ElementoAuxiliar = ElementoAuxiliar->proximo;
+      while (ElementoAuxiliar->_proximo->_proximo != NULL){
+        ElementoAuxiliar = ElementoAuxiliar->_proximo;
       }
-      Elemento<T> *ultimoElemento = ElementoAuxiliar->proximo;
-      T DadoRemovido = ultimoElemento->dado;
+      Elemento<T> *ultimoElemento = ElementoAuxiliar->_proximo;
+      T DadoRemovido = ultimoElemento->_dado;
       delete ultimoElemento;
-      ElementoAuxiliar->proximo = NULL;
+      ElementoAuxiliar->_proximo = NULL;
       this->_tamanho--;
       return DadoRemovido;
     }
     return 0;
   };
 
-  void remover(T dado){
+  T retiraEspecifico(T umDado){
     if(this->_primeiro == NULL){
       throw lista_encadeada_vazia_exception();
     }
-    else if(contem(dado) == false){
-      throw nao_implementado_exception();
+    else if(contem(umDado) == false){
+      throw posicao_invalida_exception();
     }
     else{
-      size_t indice = posicao(dado);
-      removerDe(indice);
+      size_t indice = posicao(umDado);
+      retiraDaPosicao(indice);
     } 
+  return 0;
   };
 };
 
